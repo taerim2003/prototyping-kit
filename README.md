@@ -33,13 +33,26 @@
 
 ## 새 기기에서 처음 켤 때 (1회성 환경 세팅)
 
-프로토타입 시작과 별개로, **새 컴퓨터**에서는 한 번 다음을 수행한다:
+이 repo(`taerim2003/prototyping-kit`)는 **키트 콘텐츠만** 담는다. 자동화 *배선*은 `~/.claude`에 있어 repo에 포함되지 않으므로, 새 컴퓨터에선 아래를 한 번 수행해야 자동화가 켜진다.
 
-- **Notion MCP 등록** (user scope — 이 기기 모든 프로젝트 공용):
-  ```bash
-  claude mcp add notion --scope user --env NOTION_TOKEN=<토큰> -- npx -y @notionhq/notion-mcp-server
-  ```
-  환경변수 이름은 반드시 `NOTION_TOKEN` (서버 요구명). 등록 후 `claude mcp list`로 `✓ Connected` 확인, **Claude Code 재시작** 해야 도구가 붙는다. 실패 시 Node.js(`npx`) 설치 여부부터 확인.
+1. **키트 clone** — 경로는 가급적 동일하게(`f:\Prototyping\_KIT`). 다르면 아래 훅 경로도 맞춰 바꿀 것.
+   ```bash
+   git clone https://github.com/taerim2003/prototyping-kit.git f:\Prototyping\_KIT
+   ```
+2. **Notion MCP 등록** (user scope — 이 기기 모든 프로젝트 공용):
+   ```bash
+   claude mcp add notion --scope user --env NOTION_TOKEN=<토큰> -- npx -y @notionhq/notion-mcp-server
+   ```
+   환경변수 이름은 반드시 `NOTION_TOKEN`. `claude mcp list`로 `✓ Connected` 확인. 실패 시 Node.js(`npx`) 설치 여부부터.
+3. **`~/.claude` 배선** (없으면 추가):
+   - `CLAUDE.md` 에 온보딩 트리거 1줄 — "`f:\Prototyping` 아래 새 프로토타입 시작 의도 시 `_KIT\ONBOARDING.md`를 따른다".
+   - `settings.json` 에 SessionStart 훅:
+     ```json
+     "hooks": { "SessionStart": [ { "hooks": [ { "type": "command",
+       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"f:\\Prototyping\\_KIT\\hooks\\session-start-brief.ps1\"" } ] } ] }
+     ```
+   - (선택) `"permissions": { "defaultMode": "bypassPermissions" }`.
+4. **Claude Code 재시작** — MCP·훅·권한 모드는 재시작 후 적용.
 
 ---
 
