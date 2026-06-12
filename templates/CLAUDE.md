@@ -84,10 +84,11 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## 7. 세션 시작 루틴
 
+0. **코딩 첫 세션이면**: `SESSION_ZERO.md` 완료 여부 확인. 미완성이면 코딩 전에 채울 것.
 1. `HANDOFF.md` 읽어서 현재 상태 파악
 2. 코드 작업이 예상되면 `ARCHITECTURE.md` 함께 읽어 구조 파악 (폴더 책임·매니저 호출관계·"X 추가하려면 어디 손대나" 표)
 3. `GDD.md`는 `grep`으로 필요한 섹션만 조각내어 읽을 것 (`cat GDD.md` 금지)
-4. (선택) 최근 일기 `f:\Prototyping\_KIT\journal\` 의 마지막 1~2편 훑어 과정상 미해결 마찰 확인
+4. (선택) 최근 일기 `d:\unity\prototyping-kit\journal\` 의 마지막 1~2편 훑어 과정상 미해결 마찰 확인
 5. 한 줄 브리핑 후 사용자에게 다음 목표 확인
 
 ---
@@ -103,6 +104,16 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## 9. 세션 종료 시 반드시 할 것
 
 1. `HANDOFF.md` 업데이트 (빌드 상태 / 미해결 이슈 / 다음 할 일)
-2. **세션 일기 작성** → `f:\Prototyping\_KIT\journal\YYYY-MM-DD.md`
-   (틀: `_KIT\templates\JOURNAL_ENTRY.md`. 게임이 아니라 *과정*의 회고. 하루 두 번째 세션이면 같은 파일에 `## 세션 N` 추가)
+2. **세션 일기 작성** → `d:\unity\prototyping-kit\journal\YYYY-MM-DD.md`
+   (틀: `templates\JOURNAL_ENTRY.md`. 게임이 아니라 *과정*의 회고. 하루 두 번째 세션이면 같은 파일에 `## 세션 N` 추가)
 3. git commit + push (변경 파일 전체 스테이징, origin main)
+
+## 10. 프로젝트 종료 루틴
+
+플레이 빌드 배포 후 또는 프로토타입 중단 결정 후:
+
+1. `RETROSPECTIVE.md` 작성 (틀: `templates\RETROSPECTIVE.md`)
+   — What Went Well/Wrong은 **워크플로 수준**으로. 코드 버그 목록 아님.
+   — 과정 개선안 중 Kit에 반영할 것은 **[→ Kit]** 표시 후 실제 반영
+2. 노션 등 외부 도구에 공유 (선택)
+3. 다음 프로토타입 SESSION_ZERO 작성 시 이 회고 먼저 읽을 것
