@@ -25,7 +25,7 @@
 
 **에이전트가 [ONBOARDING.md](ONBOARDING.md) 런북을 따라 사용자를 단계별로 안내한다.** (사람이 수동으로 밟을 필요 없음 — "새 프로토타입 시작하자"라고 하면 에이전트가 절차를 진행한다.) 런북 요지:
 
-1. 개념 수집(컨셉·장르·레퍼런스·작업명) → 2. Unity 프로젝트 생성(사용자, Unity Hub) → 3. 템플릿+.gitignore 복사 → 4. CLAUDE §5 / GDD §1~2 / HANDOFF 채움 → 5. git init + 첫 커밋 → 6. 첫 세션 인계.
+1. 개념 수집(컨셉·장르·레퍼런스·작업명) → 2. Unity 프로젝트 생성(사용자, Unity Hub) → 3. 템플릿+.gitignore 복사 → 4. CLAUDE §5 / GDD §1~2 / HANDOFF 채움 → 5. git init + 첫 커밋 → 6. SESSION_ZERO 스코프 선언(같은 세션에서, Must Have 3개 이하로 컷) → 7. 첫 세션 인계.
 
 레이아웃: **git 루트 = Unity 프로젝트 루트** (문서가 `Assets/` 옆). 표준 Unity `.gitignore` 한 장이 그대로 동작.
 

@@ -88,10 +88,18 @@ git -C f:\Prototyping\<작업명> commit -m "[init] Unity 프로젝트 + 프로�
 커밋 전 `git status`로 `Library/`·`Temp/` 등이 제외됐는지 확인. 잡혀 있으면 `.gitignore` 위치·내용 점검(루트에 있는지).
 원격은 사용자가 원할 때만 — `git remote add` 여부를 묻는다.
 
-### 6. 첫 작업 세션으로 인계
-- HANDOFF의 "다음 세션 체크리스트"에 첫 목표(보통 핵심 루프/첫 시스템 설계)를 적는다.
+### 6. SESSION_ZERO — 코딩 전 스코프 선언 (건너뛰지 말 것)
+`CLAUDE.md` §7-0은 "코딩 첫 세션이면 SESSION_ZERO.md 완료 여부 확인"을 요구하지만, 온보딩만 마치고 바로 코딩으로 넘어가면 이 게이트를 놓치기 쉽다. **git 커밋 직후, 인계 전에 여기서 반드시 짚는다.**
+- `templates\SESSION_ZERO.md`를 프로젝트 루트에 복사.
+- 사용자와 대화하며 5개 섹션(핵심 루프 한 문장 / 씬 목록 3개 이하 / 피쳐 티어 — **Must Have 3개 이하** / 아키텍처 전제 / Known Unknowns)을 채운다.
+- GDD에 이미 상세 스펙(스킬 목록, 스테이지 수 등)이 있어도 그대로 옮기지 말 것 — Must Have를 초과하는 항목은 Should/Won't Have로 잘라내는 것이 이 단계의 핵심 목적("실현 가능한 프로토타입 범위"를 정하는 것).
+- 온보딩과 같은 세션에서 이어서 진행하는 것을 권장한다 (컨텍스트가 따뜻할 때 협의가 더 정확함). 별도 세션으로 미룰 이유가 없다면 바로 진행.
+- 5개 섹션 전부 채워지기 전엔 코딩 세션(세션 1) 시작 금지.
+
+### 7. 첫 작업 세션으로 인계
+- HANDOFF의 "다음 세션 체크리스트"에 첫 목표(보통 SESSION_ZERO의 Must Have 1번)를 적는다.
 - 세션 종료 시 일기 1편을 `f:\Prototyping\_KIT\journal\YYYY-MM-DD.md`에 남긴다 (CLAUDE.md §9).
-- 사용자에게 "이제 GDD 시스템 설계부터 시작할까요?"로 자연스럽게 첫 세션을 연다.
+- 사용자에게 "이제 Must Have #1부터 코딩 시작할까요?"로 자연스럽게 첫 세션을 연다.
 
 ---
 
@@ -101,4 +109,34 @@ git -C f:\Prototyping\<작업명> commit -m "[init] Unity 프로젝트 + 프로�
 - [ ] 템플릿 4종 + .gitignore 복사
 - [ ] CLAUDE §5 / GDD §1~2 / HANDOFF 현재상태 채움
 - [ ] git init + 첫 커밋, Library 제외 확인
+- [ ] SESSION_ZERO.md 5개 섹션 전부 채움 (Must Have 3개 이하로 스코프 컷)
 - [ ] 첫 세션 목표를 HANDOFF에 기록 후 인계
+
+---
+
+## 세션 시작 시 Notion MCP 트러블슈팅
+
+사용자가 "노션 문서 찾아봐" 또는 노션 관련 요청을 하는데 Notion 도구가 없으면:
+
+**원인**: Claude Code 업데이트·재설치·`/config` 저장 시 `~/.claude/settings.json`이 재작성되면서 MCP 설정이 날아가는 경우가 있음.
+
+**해결**: Notion MCP 설정은 `~/.claude/settings.json`이 아닌 `C:\Users\User\.mcp.json`에 저장돼 있어야 안전함.
+
+1. `C:\Users\User\.mcp.json` 파일이 존재하는지 확인
+2. 없으면 아래 내용으로 생성 (토큰은 Notion 개발자 포털 → 개인 액세스 토큰에서 발급):
+   ```json
+   {
+     "mcpServers": {
+       "notion": {
+         "command": "npx",
+         "args": ["-y", "@notionhq/notion-mcp-server"],
+         "env": {
+           "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer <토큰>\", \"Notion-Version\": \"2022-06-28\"}"
+         }
+       }
+     }
+   }
+   ```
+3. Claude Code 재시작
+
+**토큰 발급**: notion.so → 우측 상단 프로필 → Settings → 연결 → 개발자 포털로 이동 → 개인 액세스 토큰 → 새 토큰 생성
