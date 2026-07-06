@@ -18,8 +18,10 @@
 
 ## 어디서 여나 (Claude Code 실행 위치)
 
-- **온보딩 시작 시**: 상위 `f:\Prototyping\` 에서 Claude Code를 연다. (Unity 프로젝트 폴더가 아직 없으므로. 빈 폴더를 미리 만들지 말 것 — Unity Hub가 직접 생성한다.)
-- **온보딩 이후 일상 작업**: 만들어진 `f:\Prototyping\<작업명>\` 에서 직접 연다.
+> **주의**: 아래 `f:\Prototyping\`은 원래 기기 기준 예시 경로다. **기기마다 키트 형제 폴더의 실제 루트가 다를 수 있음** (예: 이 repo가 `d:\unity\prototyping-kit\`에 있고 형제 프로토타입들이 `d:\unity\` 아래 있는 기기도 있음). 온보딩 시작 전 이 키트 repo(`_KIT` 또는 `prototyping-kit`)가 실제로 어디 있는지, 그 부모 폴더를 실제 루트로 확인하고 아래 경로를 그에 맞게 치환할 것.
+
+- **온보딩 시작 시**: 위에서 확인한 실제 루트(예: `f:\Prototyping\` 또는 `d:\unity\`)에서 Claude Code를 연다. (Unity 프로젝트 폴더가 아직 없으므로. 빈 폴더를 미리 만들지 말 것 — Unity Hub가 직접 생성한다.)
+- **온보딩 이후 일상 작업**: 만들어진 `<루트>\<작업명>\` 에서 직접 연다.
 
 ---
 
@@ -86,7 +88,7 @@ git -C f:\Prototyping\<작업명> add -A
 git -C f:\Prototyping\<작업명> commit -m "[init] Unity 프로젝트 + 프로토타입 키트 문서"
 ```
 커밋 전 `git status`로 `Library/`·`Temp/` 등이 제외됐는지 확인. 잡혀 있으면 `.gitignore` 위치·내용 점검(루트에 있는지).
-원격은 사용자가 원할 때만 — `git remote add` 여부를 묻는다.
+원격은 사용자가 원할 때만 — `git remote add` 여부를 묻는다. GitHub로 연결하기로 하면 `gh --version`으로 CLI 설치 여부부터 확인 (미설치 기기가 있었음 — `winget install --id GitHub.cli`로 설치, MSI 설치가 "install server not responding"으로 실패하면 한 번 더 재시도).
 
 ### 6. SESSION_ZERO — 코딩 전 스코프 선언 (건너뛰지 말 것)
 `CLAUDE.md` §7-0은 "코딩 첫 세션이면 SESSION_ZERO.md 완료 여부 확인"을 요구하지만, 온보딩만 마치고 바로 코딩으로 넘어가면 이 게이트를 놓치기 쉽다. **git 커밋 직후, 인계 전에 여기서 반드시 짚는다.**
