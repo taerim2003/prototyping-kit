@@ -13,6 +13,8 @@ Before implementing:
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
+- **요청 속 명사를 일반어로 읽기 전에 `grep`할 것.** 프로젝트에 그 이름의 필드·함수·루트명이 이미 있으면 사용자가 말한 건 그쪽이다. ("성장률"을 레벨업 커브로 읽었는데 실제로는 `GrowthStacks` 기믹이었던 적 있음 — 왕복 하나를 통째로 날림.)
+- **음성 받아쓰기로 들어온 숫자는 신뢰하지 말 것.** "이 십"이 15인지 20인지처럼 갈리면 추론하지 말고 물어본다.
 
 ## 2. Simplicity First
 
@@ -41,6 +43,8 @@ When your changes create orphans:
 - Don't remove pre-existing dead code unless asked.
 
 The test: Every changed line should trace directly to the user's request.
+
+**예외 — 커플링된 상수는 같이 고쳐야 한다.** 밸런스 상수 하나를 바꾸라는 요청이 옆 상수를 조용히 깨뜨리는 일이 흔하다(적 정지거리를 벌렸더니 돌진이 허공을 치고, 소환 지점이 대응 불가가 됨). **바꾸기 전에 "이 값과 한 세트인 값"을 찾을 것** — 주석에 다른 상수 이름이 등장하면 그게 커플링 신호다. 같이 고쳤으면 서로를 가리키는 주석을 남기고, 변경 전과 같은 관계가 유지되는지 수치로 확인한다.
 
 ## 4. Goal-Driven Execution
 
@@ -78,6 +82,10 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - 에디터에서 할 수 있는 것(오브젝트 배치·크기·참조 연결)은 에디터에서. 코드는 로직만.
 - **Unity 프로젝트는 Unity-MCP(IvanMurzak, `com.ivanmurzak.unity.mcp`) 사용을 기본값으로 고려한다.** AI가 씬 오브젝트 배치·컴포넌트 연결·프리팹 생성·플레이모드 진입까지 직접 수행 — 블루베리 디펜스 프로토타입에서 검증됨: 사용자가 매 피쳐 직접 테스트/수정하는 왕복이 줄고, 그림 작업과 병렬 진행이 가능해짐.
 - **시각적 판단 원칙**: 스프라이트 방향·색감·스타일처럼 정적인 시각 요소는 결정 전에 원본 이미지를 직접 보고 판단한다 (임포트 설정 잡을 때 이미 여는 파일이라 추가 비용 거의 없음). 파티클·애니메이션처럼 동적인 결과는 스크린샷 검증의 신뢰도가 낮으니 사용자 확인에 맡긴다.
+  - **좌표를 정할 땐 배경 그림에서 근거를 뽑을 것.** 배경 PNG의 픽셀 행을 색으로 분류하면 "수평선·지평선이 월드 y 몇인가"가 바로 나온다. 눈대중으로 넣고 되묻는 왕복보다 싸다.
+- 🚫 **모달을 띄우는 에디터 API는 절대 호출 금지** — 다이얼로그가 뜨면 에디터가 멈추고 **MCP 연결이 통째로 죽는다**(사용자가 창을 눌러줄 때까지 아무것도 못 함). `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()`(→ `SaveScene`을 쓸 것), `EditorUtility.DisplayDialog`, `OpenFilePanel` 계열.
+- **플레이모드 측정 체크리스트**: ① `Time.timeScale`·`Time.time`이 흐르는가(게임오버면 0이라 deltaTime 기반 값이 굳는다 — 버그로 오판하기 쉬움) ② **플레이 중엔 스크립트가 컴파일되지 않는다**(수정 → 종료 → 컴파일 확인 → 재진입) ③ MCP 코드 실행은 호출마다 독립 어셈블리라 static이 안 넘어간다 — 시계열 샘플링 대신 **"어기면 반드시 벗어나는 불변식"**을 한 번에 판정 ④ 씬을 임시로 고쳤으면 되돌리고 `git status`로 확인.
+- **에셋을 코드로 생성·수정하면 되읽어서 검증할 것.** 일부 필드 대입이 **조용히 무시**될 수 있다(실제로 `SpriteRenderer.sprite`에서 발생). 프리팹 수정은 `PrefabUtility.LoadPrefabContents` + `SerializedObject`가 가장 확실.
 - UI 작성 규칙은 프로젝트가 쓰는 시스템에 맞춰 여기 기입:
   - **uGUI 사용 시**: UI 오브젝트(Canvas·Text·Button)는 씬에 배치, 코드는 SerializeField 참조만.
   - **UI Toolkit 사용 시**: 레이아웃은 UXML/USS로 선언적으로, 코드(C#)는 데이터 바인딩·로직만.
