@@ -86,6 +86,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - 🚫 **모달을 띄우는 에디터 API는 절대 호출 금지** — 다이얼로그가 뜨면 에디터가 멈추고 **MCP 연결이 통째로 죽는다**(사용자가 창을 눌러줄 때까지 아무것도 못 함). `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()`(→ `SaveScene`을 쓸 것), `EditorUtility.DisplayDialog`, `OpenFilePanel` 계열.
 - **플레이모드 측정 체크리스트**: ① `Time.timeScale`·`Time.time`이 흐르는가(게임오버면 0이라 deltaTime 기반 값이 굳는다 — 버그로 오판하기 쉬움) ② **플레이 중엔 스크립트가 컴파일되지 않는다**(수정 → 종료 → 컴파일 확인 → 재진입) ③ MCP 코드 실행은 호출마다 독립 어셈블리라 static이 안 넘어간다 — 시계열 샘플링 대신 **"어기면 반드시 벗어나는 불변식"**을 한 번에 판정 ④ 씬을 임시로 고쳤으면 되돌리고 `git status`로 확인.
 - **에셋을 코드로 생성·수정하면 되읽어서 검증할 것.** 일부 필드 대입이 **조용히 무시**될 수 있다(실제로 `SpriteRenderer.sprite`에서 발생). 프리팹 수정은 `PrefabUtility.LoadPrefabContents` + `SerializedObject`가 가장 확실.
+- ⚖️ **계기와 눈이 어긋나면 관측을 먼저 의심할 것.** 로그로 찍은 상태값(enabled·알파·rect·`Time.timeScale`)이 전부 정상인데 화면이 이상해 보이면, 대개 화면을 잘못 읽은 것이다. 코드를 파기 전에 **대조 실험 한 번**(색을 불투명으로 바꿔 재촬영, 값을 극단으로 밀어보기)이 추측보다 훨씬 싸다. 두 세션 연속 이걸로 헛발질했다.
 - UI 작성 규칙은 프로젝트가 쓰는 시스템에 맞춰 여기 기입:
   - **uGUI 사용 시**: UI 오브젝트(Canvas·Text·Button)는 씬에 배치, 코드는 SerializeField 참조만.
   - **UI Toolkit 사용 시**: 레이아웃은 UXML/USS로 선언적으로, 코드(C#)는 데이터 바인딩·로직만.
