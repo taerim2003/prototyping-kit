@@ -11,6 +11,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 Before implementing:
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
+- 선택지를 낼 땐 **손잡이 이름(필드명·상수명)이 아니라 화면/사용자에게 벌어지는 일로** 먼저 한 줄 설명할 것. 사용자는 코드 필드로 생각하지 않는다 — 같은 단어를 서로 다른 뜻으로 쓰다 **선택지 전체가 헛다리를 짚고 정답이 그 밖에 있었던** 적 있음.
 - If a simpler approach exists, say so. Push back when warranted.
 - If something is unclear, stop. Name what's confusing. Ask.
 - **요청 속 명사를 일반어로 읽기 전에 `grep`할 것.** 프로젝트에 그 이름의 필드·함수·루트명이 이미 있으면 사용자가 말한 건 그쪽이다. ("성장률"을 레벨업 커브로 읽었는데 실제로는 `GrowthStacks` 기믹이었던 적 있음 — 왕복 하나를 통째로 날림.)
@@ -94,6 +95,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
   - **커밋 직전 `git status`의 모든 줄을 설명할 수 있어야 한다.** 설명 못 하는 줄이 있으면 그게 사고다.
 - **검증은 위에서부터 — 아래로 갈수록 비싸다.** ① **에디트모드 리플렉션 테스트**(순수 로직. `new GameObject().AddComponent<T>()`는 Awake가 안 돌아 프리팹 참조 없이도 된다) → ② **에디터 스크립트 반환값 대조**(손계산 말고 게임이 실제로 쓰는 경로로) → ③ **플레이모드 스모크**(연출·물리처럼 정말 실행이 필요할 때만) → ④ **사용자에게 물어보기**(버튼 하나 눌러보면 되는 UI 동작은 "눌러보고 알려줘"가 더 빠르고 정확).
   ⚠️ **에디트모드 `Instantiate`는 Awake를 안 돈다** — 런타임 필드를 에디트모드에서 읽어 검증하려 들지 말 것.
+  ⚠️ **검산 스크립트를 새로 쓰면 대조군부터 돌린다** — 고치기 *전* 데이터처럼 **위반이 나와야 정상인 입력**에 먼저 돌려 실제로 실패가 찍히는지 볼 것. "전부 통과"는 검증이 아니라 **의심 신호**다. (PowerShell은 변수 대소문자를 안 가려서 루프 안의 `$warn`이 상수 `$WARN`을 덮어 검사가 통째로 무력화된 적 있음 — before/after를 둘 다 돌린 덕에 걸렸다.)
 - 🧰 **MCP 툴 중 못 미더운 것들** — `scene-open`(멀쩡한 경로를 거부 → `EditorSceneManager.OpenScene` 직접 호출) / `console-get-logs`(누적 버퍼 전체를 뱉어 토큰 초과 → **검증은 `Debug.Log`가 아니라 스크립트 반환값으로**) / `gameobject-duplicate`(반환값이 원본을 가리킴 → 부모 재조회로 `"(N)"` 찾기) / 스크립트 실행은 **관련 동작을 한 호출에 몰되**, 플레이모드 상태 전이만은 한 호출에 하나씩.
 - ⚖️ **계기와 눈이 어긋나면 관측을 먼저 의심할 것.** 로그로 찍은 상태값(enabled·알파·rect·`Time.timeScale`)이 전부 정상인데 화면이 이상해 보이면, 대개 화면을 잘못 읽은 것이다. 코드를 파기 전에 **대조 실험 한 번**(색을 불투명으로 바꿔 재촬영, 값을 극단으로 밀어보기)이 추측보다 훨씬 싸다. 두 세션 연속 이걸로 헛발질했다.
 - UI 작성 규칙은 프로젝트가 쓰는 시스템에 맞춰 여기 기입:
