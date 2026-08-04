@@ -91,7 +91,7 @@ git -C f:\Prototyping\<작업명> commit -m "[init] Unity 프로젝트 + 프로�
 원격은 사용자가 원할 때만 — `git remote add` 여부를 묻는다. GitHub로 연결하기로 하면 `gh --version`으로 CLI 설치 여부부터 확인 (미설치 기기가 있었음 — `winget install --id GitHub.cli`로 설치, MSI 설치가 "install server not responding"으로 실패하면 한 번 더 재시도).
 
 ### 6. SESSION_ZERO — 코딩 전 스코프 선언 (건너뛰지 말 것)
-`CLAUDE.md` §7-0은 "코딩 첫 세션이면 SESSION_ZERO.md 완료 여부 확인"을 요구하지만, 온보딩만 마치고 바로 코딩으로 넘어가면 이 게이트를 놓치기 쉽다. **git 커밋 직후, 인계 전에 여기서 반드시 짚는다.**
+`brief` 스킬 0단계는 "코딩 첫 세션이면 SESSION_ZERO.md 완료 여부 확인"을 요구하지만, 온보딩만 마치고 바로 코딩으로 넘어가면 이 게이트를 놓치기 쉽다. **git 커밋 직후, 인계 전에 여기서 반드시 짚는다.**
 - `templates\SESSION_ZERO.md`를 프로젝트 루트에 복사.
 - 사용자와 대화하며 5개 섹션(핵심 루프 한 문장 / 씬 목록 3개 이하 / 피쳐 티어 — **Must Have 3개 이하** / 아키텍처 전제 / Known Unknowns)을 채운다.
 - GDD에 이미 상세 스펙(스킬 목록, 스테이지 수 등)이 있어도 그대로 옮기지 말 것 — Must Have를 초과하는 항목은 Should/Won't Have로 잘라내는 것이 이 단계의 핵심 목적("실현 가능한 프로토타입 범위"를 정하는 것).
