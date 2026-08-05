@@ -67,6 +67,14 @@ PowerShell 5.1의 `Get-Content`는 **BOM 없는 UTF-8 파일을 시스템 ANSI(C
 - **씬의 컴포넌트를 코드로 찾기 전에 그 프로젝트의 씬 지도 문서**(예: `SCENE_MAP.md`)**부터 볼 것.** "프리팹이겠지"라고 넘겨짚고 프리팹 전수 검색을 짰다가 헛돈 적 있다(세션26 — 플레이어가 프리팹이 아니라 씬 오브젝트였다. 지도에 적혀 있었다).
 - **`gameobject-duplicate`** — 반환값이 원본을 가리킨다. → 복제 후 **부모를 재조회**해 `"(N)"` 접미사로 찾기.
 - **`script-execute`** — 관련 동작은 한 호출에 몰되(중간 도메인 리로드로 상태 리셋), **플레이모드 상태 전이만은 한 호출에 하나씩**. 문자열에 이스케이프 따옴표(`\"`) 금지(`"a" + var + "b"`로).
+  - 🔴 **결과는 `Debug.Log`가 아니라 반환값으로 받는다.** `console-get-logs`가 훅에 막혀 있어 **로그를 읽을 수단이 없다** —
+    `void`로 짜고 로그를 찍으면 실행은 `Success`로 끝나는데 정작 결과를 못 본다. `public static string Main()`으로 만들어
+    `StringBuilder`에 담아 `return`할 것. **코드를 짜기 전에 정하는 첫 결정이다.**
+  - ⚠️ **에디트모드 `AddComponent`가 조용히 `null`을 반환할 수 있다** — `[RequireComponent(typeof(Collider2D))]`처럼
+    요구 타입이 **추상 클래스**면 Unity가 자동 추가를 못 한다. 구체 타입(`BoxCollider2D`)을 먼저 붙일 것.
+    증상이 `"Non-static method requires a target"`으로 나와 원인을 안 가리킨다(리플렉션 `Invoke`에 null을 넘긴 것이라).
+  - ⚠️ **Unity 6에서 바뀐 API** — `TextureImporter.spritePixelsToUnit`/`.spriteMode`는 `TextureImporterSettings`(`ReadTextureSettings`) 경유,
+    `FindObjectsSortMode` 오버로드는 deprecated. **비활성 UI를 찾을 땐 `FindObjectsInactive.Include`가 필수**다.
 
 ## 📄 씬·프리팹·에셋에 직렬화되는 클래스는 독립 파일로
 
