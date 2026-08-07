@@ -62,6 +62,15 @@ PowerShell 5.1의 `Get-Content`는 **BOM 없는 UTF-8 파일을 시스템 ANSI(C
 
 `SpriteRenderer.sprite` 직접 대입이 **조용히 무시된** 적 있다(세션20 — 다른 필드는 다 들어갔는데 스프라이트만 안 들어감). 생성 직후 `AssetDatabase.LoadAssetAtPath`로 되읽어 로그를 찍으면 잡힌다. 프리팹 수정은 `PrefabUtility.LoadPrefabContents` + `SerializedObject`가 가장 확실하다.
 
+## 🖼 새 PNG를 배선하기 전에 "한 파일 = 한 그림인가"를 볼 것
+
+**Unity 임포트 기본값이 Multiple**이라 자동 슬라이스가 그림을 **조각낸다.** 그러면 `LoadAllAssetsAtPath(...).OfType<Sprite>().First()`가
+집는 건 의도한 그림이 아니라 **잔상·꼬리 조각**이다 — 이름이 `_0`이 아니라 `_1`로 나오면 이미 쪼개져 있다는 신호다.
+
+트리거 자명 — *새 PNG를 코드·씬에 배선하기 직전.* 서브 스프라이트 개수와 `rect`를 한 번 찍어 보고,
+통짜로 쓸 그림이면 `TextureImporterSettings.spriteMode = 1`(Single)로 고친 뒤 배선한다.
+(2026-08-07: 아이콘 32장은 조각이 하나뿐이라 무사했는데 **이펙트 2장만 2조각**이라 하마터면 꼬리만 날릴 뻔했다.)
+
 ## 🪝 위험 호출은 훅으로 막는다
 
 프로젝트에 `PreToolUse` 훅이 설치돼 있으면 모달 API 문자열·`scene-open`·`console-get-logs`·Additive 없는 `OpenScene` 호출이 차단된다.
