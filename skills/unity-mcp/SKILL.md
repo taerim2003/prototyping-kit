@@ -104,6 +104,20 @@ PowerShell 5.1의 `Get-Content`는 **BOM 없는 UTF-8 파일을 시스템 ANSI(C
   - ⚠️ **Unity 6에서 바뀐 API** — `TextureImporter.spritePixelsToUnit`/`.spriteMode`는 `TextureImporterSettings`(`ReadTextureSettings`) 경유,
     `FindObjectsSortMode` 오버로드는 deprecated. **비활성 UI를 찾을 땐 `FindObjectsInactive.Include`가 필수**다.
 
+## 🧱 `Assets/Scripts` 밖의 코드를 고치기 전에 asmdef를 찾을 것
+
+**asmdef가 있는 어셈블리는 기본 어셈블리(`Assembly-CSharp`)를 참조할 수 없다.** 참조가 단방향이라서다 —
+`Assembly-CSharp`가 모든 asmdef를 자동으로 참조하므로, 반대 방향을 열면 순환이 된다.
+즉 **서드파티 UI·플러그인 폴더의 스크립트에서 내 게임 클래스를 부르면 컴파일이 깨진다.**
+
+트리거 자명 — *`Assets/Scripts` 밖 파일에 다른 폴더의 클래스를 호출하는 줄을 추가하려는 순간.*
+`find Assets -name "*.asmdef"` 한 번이면 끝난다.
+
+→ 해법은 **방향을 뒤집는 것**: 그쪽에 `public static event`를 두고 이쪽에서 구독한다
+(`[RuntimeInitializeOnLoadMethod]`로 구독하고, 도메인 리로드를 끈 설정을 대비해 `-=` 뒤 `+=`).
+(2026-08-10: `JuicyButton`(`JuicyUI.Runtime.asmdef`)에 `SfxPlayer.Play()`를 직접 넣었다가 되돌렸다.
+**그때 Unity가 꺼져 있어 컴파일 검증이 불가능했으므로, 의심하지 않았으면 다음 세션까지 몰랐을 자리다.**)
+
 ## 📄 씬·프리팹·에셋에 직렬화되는 클래스는 독립 파일로
 
 `MonoBehaviour`·`ScriptableObject`는 **반드시 파일명 = 클래스명인 자기 파일**에 둔다. 다른 .cs에 곁다리로 넣으면 `m_Script: {fileID: 0}`이 되어 **에디터에선 멀쩡한데 빌드에서만** 컴포넌트가 안 붙거나 SO가 null로 로드된다(빌드 데미지 숫자 "0" · 빌드에서 전 스테이지 동일 — 둘 다 이것). 런타임 `AddComponent` 전용이면 합쳐도 된다.
