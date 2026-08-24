@@ -131,6 +131,25 @@ Unity가 필요 없는 작업으로 옮겨간다 — 조용히 기다리면 사�
 
 `SpriteRenderer.sprite` 직접 대입이 **조용히 무시된** 적 있다(세션20 — 다른 필드는 다 들어갔는데 스프라이트만 안 들어감). 생성 직후 `AssetDatabase.LoadAssetAtPath`로 되읽어 로그를 찍으면 잡힌다. 프리팹 수정은 `PrefabUtility.LoadPrefabContents` + `SerializedObject`가 가장 확실하다.
 
+### 그리고 **`Save*`가 성공을 반환해도** 파일을 되읽기 전엔 저장됐다고 하지 말 것
+
+위 규칙은 **에셋 생성**만 말해서 **`ProjectSettings` 같은 설정 저장**엔 발동을 안 한다.
+트리거 자명 — *`Save`류를 부른 직후.* **반환값도 mtime도 근거가 못 된다** — 파일을 열어 그 값을 봐야 한다.
+
+- `PlayerSettings.companyName` 같은 **프로젝트 설정은 `AssetDatabase.SaveAssets()`로 저장되지 않는다.**
+- `EditorApplication.ExecuteMenuItem("File/Save Project")`는 **`true`를 반환하고도 아무것도 안 할 수 있다.**
+- 🔴 `InternalEditorUtility.SaveToSerializedFileAndForget`은 **쓰지 말 것.** `true`를 반환하고 **파일 mtime까지 갱신**하는데
+  값은 그대로였고, 무엇보다 **설정 파일을 통째로 덮어쓸 수 있는 수**다(운 좋게 같은 내용이라 손상이 없었을 뿐).
+- → **설정 저장은 사용자에게 넘긴다**: Unity 창에서 `File > Save Project` 또는 **에디터 정상 종료**.
+  (2026-08-24: `companyName` 변경을 세 방법 전부로 시도했지만 디스크에 안 써졌다. `grep`으로 파일을 확인하고서야 알았다.)
+
+### 도구가 알려주는 **타입·메타데이터**를 근거로 쓰기 전에 실제 값을 한 번 찍을 것
+
+트리거 자명 — *`GetType`·`GetValueKind`·`typeName` 같은 걸 **분기 조건**으로 삼으려는 순간.*
+(2026-08-24: 레지스트리 `GetValueKind`가 **DWord**라고 했지만 실제 값은 **Int64**였다 — Unity가 float `PlayerPrefs`를
+**QWORD**로 저장한다. 그 보고를 믿고 `RegistryValueKind::DWord`로 **3번 연속 실패**했다.
+`$raw.GetType().Name`을 찍자 즉시 갈렸다.)
+
 ## 🖼 새 PNG를 배선하기 전에 "한 파일 = 한 그림인가"를 볼 것
 
 **Unity 임포트 기본값이 Multiple**이라 자동 슬라이스가 그림을 **조각낸다.** 그러면 `LoadAllAssetsAtPath(...).OfType<Sprite>().First()`가
