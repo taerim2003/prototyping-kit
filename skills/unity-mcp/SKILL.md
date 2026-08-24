@@ -148,12 +148,18 @@ Unity가 필요 없는 작업으로 옮겨간다 — 조용히 기다리면 사�
 위 규칙은 **에셋 생성**만 말해서 **`ProjectSettings` 같은 설정 저장**엔 발동을 안 한다.
 트리거 자명 — *`Save`류를 부른 직후.* **반환값도 mtime도 근거가 못 된다** — 파일을 열어 그 값을 봐야 한다.
 
-- `PlayerSettings.companyName` 같은 **프로젝트 설정은 `AssetDatabase.SaveAssets()`로 저장되지 않는다.**
-- `EditorApplication.ExecuteMenuItem("File/Save Project")`는 **`true`를 반환하고도 아무것도 안 할 수 있다.**
-- 🔴 `InternalEditorUtility.SaveToSerializedFileAndForget`은 **쓰지 말 것.** `true`를 반환하고 **파일 mtime까지 갱신**하는데
-  값은 그대로였고, 무엇보다 **설정 파일을 통째로 덮어쓸 수 있는 수**다(운 좋게 같은 내용이라 손상이 없었을 뿐).
-- → **설정 저장은 사용자에게 넘긴다**: Unity 창에서 `File > Save Project` 또는 **에디터 정상 종료**.
-  (2026-08-24: `companyName` 변경을 세 방법 전부로 시도했지만 디스크에 안 써졌다. `grep`으로 파일을 확인하고서야 알았다.)
+- 🔴 **원인은 저장이 아니라 *쓰기* 쪽이다.** `PlayerSettings.companyName = "..."` 같은 **C# 프로퍼티 setter는 캐시만 바꾼다.**
+  파일에 직렬화되는 `SerializedObject`는 옛 값을 그대로 들고 있고 dirty도 안 붙어서, **저장 루틴이 그 필드만 건너뛴다.**
+  파일 자체는 매번 새로 쓰인다(mtime이 갱신되는데 그 줄만 안 바뀌는 것이 증상).
+- 🔴 **되읽기 검증이 통과해 버린다** — `PlayerSettings.companyName`을 다시 읽으면 setter와 **같은 캐시**를 본다.
+  **검증은 `SerializedObject` 또는 파일 자체로 할 것.**
+- ✅ **해법**: `new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0])` →
+  `FindProperty(...)` 수정 → `ApplyModifiedPropertiesWithoutUndo()` → `EditorUtility.SetDirty(obj)` → `AssetDatabase.SaveAssets()`.
+  배열형(`applicationIdentifier`)은 `GetArrayElementAtIndex(i)`의 `first`/`second`를 찾아 고친다.
+- 🔴 `InternalEditorUtility.SaveToSerializedFileAndForget`은 **쓰지 말 것** — 설정 파일을 통째로 덮어쓸 수 있는 수다.
+- ⚠️ **사용자에게 `File > Save Project`을 시키는 것은 해법이 아니다.**
+  (2026-08-24에 그렇게 진단해 HANDOFF에 적었고, 사용자가 **여러 번 눌렀지만 매번 실패**했다.
+  2026-08-25에 위 캐시 문제를 찾아 한 번에 해결했다. **오진을 문서에 박으면 사용자가 헛수고를 반복한다.**)
 
 ### 도구가 알려주는 **타입·메타데이터**를 근거로 쓰기 전에 실제 값을 한 번 찍을 것
 
