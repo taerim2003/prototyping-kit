@@ -339,6 +339,18 @@ Unity가 필요 없는 작업으로 옮겨간다 — 조용히 기다리면 사�
   - ⚠️ **Unity 6에서 바뀐 API** — `TextureImporter.spritePixelsToUnit`/`.spriteMode`는 `TextureImporterSettings`(`ReadTextureSettings`) 경유,
     `FindObjectsSortMode` 오버로드는 deprecated. **비활성 UI를 찾을 땐 `FindObjectsInactive.Include`가 필수**다.
 
+## 🤖 플레이모드를 오래 쓰는 자동화(봇·측정)를 만들 땐
+
+병렬 세션이 있는 한 **누군가는 반드시 플레이 중에 `.cs`를 저장한다.** 기본 설정은 플레이 중 재컴파일 → 도메인 리로드라
+static 상태가 날아가고, 게임은 멈춘 채 **`NullReferenceException`만 쏟아진다**(증상이 원인을 안 가리킨다).
+트리거 자명 — *에디터 스크립트로 플레이모드 진입을 부르는 코드를 쓰는 순간.*
+- 진입 직전 `EditorPrefs.SetInt("ScriptCompilationDuringPlay", 1)`(= 플레이가 끝난 뒤 컴파일). 이전 값은 `SessionState`에 넣고 **나올 때 복원**.
+- static 설정이 null이면 조용히 계속하지 말고 **오류를 파일에 쓰고 플레이를 끈다.**
+- **느려도 되는 쪽이 비켜 준다** — "쓰는 중" 파일과 "비켜 줘" 파일을 두고, 다른 세션이 후자를 만들면 판 경계에서 진행을 저장하고 나간다.
+- 세션이 도는 동안 `assets-refresh`는 부르지 말 것 — 미뤄 둔 컴파일을 기다리다 **MCP가 300초 멈춘다.**
+
+(2026-09-18 BlueberryDefense 봇 플레이테스트에서 셋 다 겪었다.)
+
 ## 🧱 `Assets/Scripts` 밖의 코드를 고치기 전에 asmdef를 찾을 것
 
 **asmdef가 있는 어셈블리는 기본 어셈블리(`Assembly-CSharp`)를 참조할 수 없다.** 참조가 단방향이라서다 —
