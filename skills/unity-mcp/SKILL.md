@@ -401,6 +401,11 @@ Unity가 필요 없는 작업으로 옮겨간다 — 조용히 기다리면 사�
   - 🔴 **결과는 `Debug.Log`가 아니라 반환값으로 받는다.** `console-get-logs`가 훅에 막혀 있어 **로그를 읽을 수단이 없다** —
     `void`로 짜고 로그를 찍으면 실행은 `Success`로 끝나는데 정작 결과를 못 본다. `public static string Main()`으로 만들어
     `StringBuilder`에 담아 `return`할 것. **코드를 짜기 전에 정하는 첫 결정이다.**
+  - 🔴 **에러로 돌아와도 실행됐을 수 있다 — 쓰기 스크립트를 다시 보내기 전에 대상 값을 먼저 읽는다.**
+    `session expired`·`Response data is null` 같은 응답은 **전송 쪽 실패**라 Unity 안에서는 이미 돌았을 수 있다.
+    트리거 자명 — *에셋·씬을 고치는 `script-execute`가 에러로 돌아온 순간.* 그대로 재전송하면 누적형 변경(×배율·+추가)이 **두 번 들어간다.**
+    → 고친 값을 읽는 스크립트를 먼저 보내고, 쓰기 스크립트는 가능하면 **"목표 값으로 맞추기"**(멱등)로 짠다.
+    (2026-10-01 BlueberryDefense: 프리팹 `spawnYOffset` 대입이 "session expired"로 돌아왔는데 다음 호출의 `before`가 이미 새 값이었다. 대입이라 무사했다.)
   - ⚠️ **에디트모드 `AddComponent`가 조용히 `null`을 반환할 수 있다** — `[RequireComponent(typeof(Collider2D))]`처럼
     요구 타입이 **추상 클래스**면 Unity가 자동 추가를 못 한다. 구체 타입(`BoxCollider2D`)을 먼저 붙일 것.
     증상이 `"Non-static method requires a target"`으로 나와 원인을 안 가리킨다(리플렉션 `Invoke`에 null을 넘긴 것이라).
