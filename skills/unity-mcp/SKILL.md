@@ -324,6 +324,11 @@ Unity가 필요 없는 작업으로 옮겨간다 — 조용히 기다리면 사�
 - ✅ **해법**: `new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/ProjectSettings.asset")[0])` →
   `FindProperty(...)` 수정 → `ApplyModifiedPropertiesWithoutUndo()` → `EditorUtility.SetDirty(obj)` → `AssetDatabase.SaveAssets()`.
   배열형(`applicationIdentifier`)은 `GetArrayElementAtIndex(i)`의 `first`/`second`를 찾아 고친다.
+- 🔴 **위 해법의 마지막 `SaveAssets()`는 🔒의 "`SaveAssets` 금지"와 부딪힌다 — 그리고 `SaveAssetIfDirty(obj)`는 ProjectSettings를 *안 쓴다*.**
+  반환도 오류도 없이 파일만 그대로다. 병렬 세션이 있으면 `SaveAssets`를 부르지 말고
+  **메모리(`SerializedObject` 수정까지)와 파일(그 한 줄을 Edit 툴로)을 둘 다 같은 값으로 맞춘다.** 둘이 같으면 나중에 누가 저장해도 값이 안 바뀐다.
+  트리거 자명 — *`ProjectSettings/*.asset`을 코드로 바꾼 뒤 저장 줄을 쓰려는 순간.* 확인은 `git diff`가 그 한 줄만 보이는가.
+  (2026-10-01 BlueberryDefense: `resizableWindow`를 `SaveAssetIfDirty`로 저장했는데 파일은 0 그대로였다.)
 - 🔴 `InternalEditorUtility.SaveToSerializedFileAndForget`은 **쓰지 말 것** — 설정 파일을 통째로 덮어쓸 수 있는 수다.
 - ⚠️ **사용자에게 `File > Save Project`을 시키는 것은 해법이 아니다.**
   (2026-08-24에 그렇게 진단해 HANDOFF에 적었고, 사용자가 **여러 번 눌렀지만 매번 실패**했다.
